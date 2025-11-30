@@ -11,7 +11,8 @@ A lightweight Python application for converting between multiple file formats in
 - **Supported Conversions:**
   - CSV ↔ JSON, NPY
   - Markdown ↔ HTML
-  - Image ↔ WebP
+  - Image ↔ WebP (soon)
+  - And more (soon)
 
 - **Web Interface:** User-friendly Streamlit UI for uploading and converting files
 - **Modular Design:** Conversion logic organized by file type pairs
