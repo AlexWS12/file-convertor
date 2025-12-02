@@ -9,13 +9,12 @@ A lightweight Python application for converting between multiple file formats in
 ## Features
 
 - **Supported Conversions:**
-  - CSV ↔ JSON, NPY
+  - CSV ↔ JSON ↔ NPY ↔ YAML
   - Markdown ↔ HTML
   - Image ↔ WebP
   - PNG ↔ JPEG
   - TXT ↔ PDF
   - TXT ↔ DOCX
-  - JSON ↔ YAML
   - And more (soon)
 
 - **Web Interface:** User-friendly Streamlit UI for uploading and converting files
