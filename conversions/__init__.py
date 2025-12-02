@@ -12,6 +12,7 @@ from .image_png_jpeg import png_to_jpeg, jpeg_to_png
 from .json_yaml import json_to_yaml, yaml_to_json
 from .yaml_npy import yaml_to_npy, npy_to_yaml
 from .yaml_csv import yaml_to_csv, csv_to_yaml
+from .json_toon import json_to_toon, toon_to_json
 
 CONVERSIONS = {
     (".md", ".html"): md_to_html,
@@ -62,4 +63,8 @@ CONVERSIONS = {
     (".yml", ".csv"): yaml_to_csv,
     (".csv", ".yaml"): csv_to_yaml,
     (".csv", ".yml"): csv_to_yaml,
+
+    # JSON ↔ TOON (minified JSON)
+    (".json", ".toon"): json_to_toon,
+    (".toon", ".json"): toon_to_json,
 }

@@ -10,7 +10,8 @@ supported_exts = [
     "csv", "json", "npy",
     "yaml", "yml",
     "png", "jpg", "jpeg", "webp",
-    "txt", "docx", "pdf"
+    "txt", "docx", "pdf",
+    "toon"
 ]
 from_ext = st.selectbox("Convert from", supported_exts)
 to_ext = st.selectbox("Convert to", [ext for ext in supported_exts if ext != from_ext])
