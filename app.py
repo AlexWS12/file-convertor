@@ -7,7 +7,7 @@ st.title("File Converter Tool")
 # Let user choose the type of conversion (from -> to)
 supported_exts = [
     "md", "html",
-    "csv", "json", "npy",
+    "csv", "json", "npy", "xml",
     "yaml", "yml",
     "png", "jpg", "jpeg", "webp",
     "txt", "docx", "pdf",
