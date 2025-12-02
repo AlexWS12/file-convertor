@@ -7,6 +7,7 @@ from .npy_csv import npy_to_csv
 from .image_webp import any_to_webp, webp_to_any
 from .docx_txt import docx_to_txt, txt_to_docx
 from .txt_pdf import txt_to_pdf
+from .pdf_txt import pdf_to_txt
 
 CONVERSIONS = {
     (".md", ".html"): md_to_html,
@@ -18,7 +19,6 @@ CONVERSIONS = {
     (".csv", ".npy"): csv_to_npy,
     (".npy", ".csv"): npy_to_csv,
 
-    # Images ↔ WEBP
     (".png", ".webp"): any_to_webp,
     (".jpg", ".webp"): any_to_webp,
     (".jpeg", ".webp"): any_to_webp,
@@ -26,10 +26,10 @@ CONVERSIONS = {
     (".webp", ".jpg"): webp_to_any,
     (".webp", ".jpeg"): webp_to_any,
 
-    # DOCX ↔ TXT
     (".docx", ".txt"): docx_to_txt,
     (".txt", ".docx"): txt_to_docx,
 
-    # TXT → PDF
     (".txt", ".pdf"): txt_to_pdf,
+
+    (".pdf", ".txt"): pdf_to_txt,
 }
