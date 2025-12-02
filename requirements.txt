@@ -5,3 +5,4 @@ python-docx
 pydub
 streamlit
 PyPDF2
+pyyaml

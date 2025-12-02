@@ -8,6 +8,7 @@ st.title("File Converter Tool")
 supported_exts = [
     "md", "html",
     "csv", "json", "npy",
+    "yaml", "yml",
     "png", "jpg", "jpeg", "webp",
     "txt", "docx", "pdf"
 ]
