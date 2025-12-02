@@ -10,6 +10,7 @@ from .txt_pdf import txt_to_pdf
 from .pdf_txt import pdf_to_txt
 from .image_png_jpeg import png_to_jpeg, jpeg_to_png
 from .json_yaml import json_to_yaml, yaml_to_json
+from .yaml_npy import yaml_to_npy, npy_to_yaml
 
 CONVERSIONS = {
     (".md", ".html"): md_to_html,
@@ -48,4 +49,10 @@ CONVERSIONS = {
     # YAML/YML → JSON
     (".yaml", ".json"): yaml_to_json,
     (".yml", ".json"): yaml_to_json,
+
+    # YAML/YML ↔ NPY
+    (".yaml", ".npy"): yaml_to_npy,
+    (".yml", ".npy"): yaml_to_npy,
+    (".npy", ".yaml"): npy_to_yaml,
+    (".npy", ".yml"): npy_to_yaml,
 }
