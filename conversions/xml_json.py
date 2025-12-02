@@ -20,11 +20,15 @@ def json_to_xml(src: Path, dst: Path) -> None:
     with open(src, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    if isinstance(data, list):
+    if isinstance(data, dict):
+        # If exactly one top-level key, use it as the root element
+        if len(data) == 1:
+            root_name, content = next(iter(data.items()))
+            obj = {root_name: content}
+        else:
+            obj = {"root": data}
+    elif isinstance(data, list):
         obj = {"root": {"item": data}}
-    elif isinstance(data, dict):
-        # ensure single root element
-        obj = {"root": data}
     else:
         obj = {"root": {"value": data}}
 

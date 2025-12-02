@@ -20,7 +20,7 @@ def _write_lines_to_pdf(lines, dst: Path) -> None:
     y = top_margin
 
     for line in lines:
-        # simple soft-wrap by character count
+        # simple wrap by character count
         text = line or ""
         while len(text) > max_chars:
             part = text[:max_chars]
