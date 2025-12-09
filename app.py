@@ -139,11 +139,44 @@ supported_exts = [
 from_ext = st.selectbox("Convert from", supported_exts)
 to_ext = st.selectbox("Convert to", [ext for ext in supported_exts if ext != from_ext])
 
+# Custom drag & drop styling
+st.markdown("""
+<style>
+    [data-testid="stFileUploadDropzone"] {
+        padding: 2rem;
+        border: 2px dashed #1f77b4;
+        border-radius: 10px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    [data-testid="stFileUploadDropzone"]:hover {
+        border-color: #ff6b6b;
+        background-color: rgba(31, 119, 180, 0.05);
+    }
+    [data-testid="stFileUploadDropzone"]::before {
+        content: "📁 Drag & Drop or Click to Browse";
+        display: block;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #1f77b4;
+    }
+    [data-testid="stFileUploadDropzone"]::after {
+        content: "Supports multiple files";
+        display: block;
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Upload multiple files that match the chosen input format
 uploaded_files = st.file_uploader(
     f"Upload .{from_ext} file(s)",
     type=[from_ext],
-    accept_multiple_files=True
+    accept_multiple_files=True,
+    label_visibility="collapsed"
 )
 
 if uploaded_files:
