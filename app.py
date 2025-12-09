@@ -3,6 +3,65 @@ from converter import convert_all, normalize_ext
 from pathlib import Path
 import zipfile
 import io
+import pandas as pd
+from PIL import Image
+import json
+import yaml
+
+def preview_file(uploaded_file, ext):
+    """Show preview based on file type."""
+    try:
+        # Text-based formats
+        if ext in ["txt", "md", "html", "xml", "yaml", "yml", "toon"]:
+            content = uploaded_file.read().decode("utf-8")
+            uploaded_file.seek(0)  # Reset for later use
+            st.code(content[:1000], language=ext if ext != "yml" else "yaml")
+            if len(content) > 1000:
+                st.caption(f"Showing first 1000 characters of {len(content)} total")
+        
+        # JSON
+        elif ext == "json":
+            content = uploaded_file.read().decode("utf-8")
+            uploaded_file.seek(0)
+            data = json.loads(content)
+            st.json(data)
+        
+        # CSV
+        elif ext == "csv":
+            df = pd.read_csv(uploaded_file)
+            uploaded_file.seek(0)
+            st.dataframe(df.head(10))
+            if len(df) > 10:
+                st.caption(f"Showing first 10 rows of {len(df)} total")
+        
+        # Images
+        elif ext in ["png", "jpg", "jpeg", "webp"]:
+            img = Image.open(uploaded_file)
+            uploaded_file.seek(0)
+            st.image(img, caption=f"{img.size[0]}x{img.size[1]} pixels", use_container_width=True)
+        
+        # PDF
+        elif ext == "pdf":
+            st.info("📄 PDF preview not available. File ready for conversion.")
+        
+        # DOCX
+        elif ext == "docx":
+            st.info("📝 DOCX preview not available. File ready for conversion.")
+        
+        # Audio
+        elif ext in ["mp3", "wav"]:
+            uploaded_file.seek(0)
+            st.audio(uploaded_file, format=f"audio/{ext}")
+        
+        # NPY
+        elif ext == "npy":
+            st.info("🔢 NumPy array preview not available. File ready for conversion.")
+        
+        else:
+            st.info("Preview not available for this format.")
+    
+    except Exception as e:
+        st.warning(f"Could not preview: {str(e)}")
 
 st.title("File Converter Tool 📁")
 
@@ -28,8 +87,17 @@ uploaded_files = st.file_uploader(
 
 if uploaded_files:
     st.write(f"📤 Uploaded {len(uploaded_files)} file(s):")
-    for uploaded_file in uploaded_files:
-        st.write(f"  • {uploaded_file.name}")
+    
+    # Preview section with tabs
+    if len(uploaded_files) == 1:
+        st.subheader("Preview")
+        preview_file(uploaded_files[0], from_ext)
+    else:
+        st.subheader("Preview")
+        tabs = st.tabs([f.name for f in uploaded_files])
+        for tab, uploaded_file in zip(tabs, uploaded_files):
+            with tab:
+                preview_file(uploaded_file, from_ext)
 
     if st.button("Convert All"):
         upload_dir = Path("uploaded_files")

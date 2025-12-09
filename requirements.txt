@@ -8,3 +8,4 @@ PyPDF2
 pyyaml
 beautifulsoup4
 xmltodict
+pandas
