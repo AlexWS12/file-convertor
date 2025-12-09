@@ -149,27 +149,46 @@ if uploaded_files:
         if converted_files:
             st.success(f"Successfully converted {len(converted_files)} file(s)")
             
-            # Single file: direct download
-            if len(converted_files) == 1:
-                with open(converted_files[0], "rb") as f:
-                    st.download_button(
-                        label=f"📥 Download {converted_files[0].name}",
-                        data=f,
-                        file_name=converted_files[0].name
-                    )
-            # Multiple files: zip download
-            else:
+            st.subheader("Download Options")
+            
+            # Multiple files: show both options
+            if len(converted_files) > 1:
+                # ZIP download
                 zip_buffer = io.BytesIO()
                 with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
                     for file_path in converted_files:
                         zip_file.write(file_path, file_path.name)
                 
                 st.download_button(
-                    label=f"📦 Download All ({len(converted_files)} files as ZIP)",
+                    label=f"📦 Download All as ZIP ({len(converted_files)} files)",
                     data=zip_buffer.getvalue(),
                     file_name=f"converted_files.zip",
                     mime="application/zip"
                 )
+                
+                # Individual downloads
+                st.write("**Or download individually:**")
+                cols = st.columns(min(3, len(converted_files)))
+                
+                for i, file_path in enumerate(converted_files):
+                    with cols[i % 3]:
+                        with open(file_path, "rb") as f:
+                            st.download_button(
+                                label=f"📄 {file_path.name}",
+                                data=f,
+                                file_name=file_path.name,
+                                key=f"download_{file_path.name}",
+                                use_container_width=True
+                            )
+            
+            # Single file: just direct download
+            else:
+                with open(converted_files[0], "rb") as f:
+                    st.download_button(
+                        label=f"📥 Download {converted_files[0].name}",
+                        data=f,
+                        file_name=converted_files[0].name
+                    )
         
         if errors:
             st.error("⚠️ Some files failed:")
