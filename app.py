@@ -83,6 +83,70 @@ with col2:
         st.session_state.dark_mode = not st.session_state.dark_mode
         st.rerun()
 
+# Tab selection
+tab1, tab2 = st.tabs(["📁 Convert Files", "📦 Extract ZIP"])
+
+with tab2:
+    st.subheader("ZIP File Extractor")
+    st.write("Upload a ZIP file to extract its contents")
+    
+    zip_file = st.file_uploader("Upload ZIP file", type=["zip"], key="zip_uploader")
+    
+    if zip_file:
+        st.write(f"📦 ZIP file: **{zip_file.name}** ({format_size(zip_file.size)})")
+        
+        try:
+            # Read ZIP file
+            zip_buffer = io.BytesIO(zip_file.read())
+            with zipfile.ZipFile(zip_buffer, 'r') as zip_ref:
+                file_list = zip_ref.namelist()
+                
+                st.success(f"Found {len(file_list)} file(s) in ZIP")
+                
+                # Show contents
+                with st.expander("📋 ZIP Contents", expanded=True):
+                    for file_name in file_list:
+                        file_info = zip_ref.getinfo(file_name)
+                        st.write(f"• **{file_name}** - {format_size(file_info.file_size)}")
+                
+                if st.button("Extract All Files"):
+                    extract_dir = Path("extracted_files")
+                    extract_dir.mkdir(exist_ok=True)
+                    
+                    progress_bar = st.progress(0)
+                    status_text = st.empty()
+                    
+                    extracted_files = []
+                    for i, file_name in enumerate(file_list):
+                        status_text.text(f"Extracting {file_name}...")
+                        zip_ref.extract(file_name, extract_dir)
+                        extracted_files.append(extract_dir / file_name)
+                        progress_bar.progress((i + 1) / len(file_list))
+                    
+                    status_text.text("✅ Extraction complete!")
+                    st.success(f"Extracted {len(extracted_files)} file(s) to `extracted_files/`")
+                    
+                    # Download individual files
+                    st.write("**Download extracted files:**")
+                    cols = st.columns(min(3, len(extracted_files)))
+                    
+                    for i, file_path in enumerate(extracted_files):
+                        if file_path.is_file():
+                            with cols[i % 3]:
+                                with open(file_path, "rb") as f:
+                                    st.download_button(
+                                        label=f"📄 {file_path.name}",
+                                        data=f,
+                                        file_name=file_path.name,
+                                        key=f"extract_{i}_{file_path.name}",
+                                        use_container_width=True
+                                    )
+        
+        except zipfile.BadZipFile:
+            st.error("❌ Invalid ZIP file")
+        except Exception as e:
+            st.error(f"❌ Error: {str(e)}")
+
 # Apply theme with custom CSS
 if st.session_state.dark_mode:
     st.markdown("""
@@ -126,34 +190,35 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-# Let user choose the type of conversion (from -> to)
-supported_exts = [
-    "md", "html",
-    "csv", "json", "npy", "xml",
-    "yaml", "yml",
-    "png", "jpg", "jpeg", "webp",
-    "txt", "docx", "pdf",
-    "toon",
-    "mp3", "wav"
-]
-from_ext = st.selectbox("Convert from", supported_exts)
-to_ext = st.selectbox("Convert to", [ext for ext in supported_exts if ext != from_ext])
+with tab1:
+    # Let user choose the type of conversion (from -> to)
+    supported_exts = [
+        "md", "html",
+        "csv", "json", "npy", "xml",
+        "yaml", "yml",
+        "png", "jpg", "jpeg", "webp",
+        "txt", "docx", "pdf",
+        "toon",
+        "mp3", "wav"
+    ]
+    from_ext = st.selectbox("Convert from", supported_exts)
+    to_ext = st.selectbox("Convert to", [ext for ext in supported_exts if ext != from_ext])
 
-# Custom drag & drop styling
-st.markdown("""
+    # Custom drag & drop styling (only for convert tab)
+    st.markdown("""
 <style>
-    [data-testid="stFileUploadDropzone"] {
+    div[data-testid="stVerticalBlock"]:has(> div > div[data-testid="stFileUploader-stFileUploaderDropzone"]) [data-testid="stFileUploadDropzone"] {
         padding: 2rem;
         border: 2px dashed #1f77b4;
         border-radius: 10px;
         text-align: center;
         transition: all 0.3s ease;
     }
-    [data-testid="stFileUploadDropzone"]:hover {
+    div[data-testid="stVerticalBlock"]:has(> div > div[data-testid="stFileUploader-stFileUploaderDropzone"]) [data-testid="stFileUploadDropzone"]:hover {
         border-color: #ff6b6b;
         background-color: rgba(31, 119, 180, 0.05);
     }
-    [data-testid="stFileUploadDropzone"]::before {
+    #convert-dropzone [data-testid="stFileUploadDropzone"]::before {
         content: "📁 Drag & Drop or Click to Browse";
         display: block;
         font-size: 1.2rem;
@@ -161,7 +226,7 @@ st.markdown("""
         margin-bottom: 0.5rem;
         color: #1f77b4;
     }
-    [data-testid="stFileUploadDropzone"]::after {
+    #convert-dropzone [data-testid="stFileUploadDropzone"]::after {
         content: "Supports multiple files";
         display: block;
         font-size: 0.9rem;
@@ -170,19 +235,22 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+    
+    st.markdown('<div id="convert-dropzone">', unsafe_allow_html=True)
 
-# Upload multiple files that match the chosen input format
-uploaded_files = st.file_uploader(
-    f"Upload .{from_ext} file(s)",
-    type=[from_ext],
-    accept_multiple_files=True,
-    label_visibility="collapsed"
-)
+    # Upload multiple files that match the chosen input format
+    uploaded_files = st.file_uploader(
+        f"Upload .{from_ext} file(s)",
+        type=[from_ext],
+        accept_multiple_files=True,
+        label_visibility="collapsed"
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
 
-if uploaded_files:
-    # Show uploaded files with sizes
-    total_size = sum(f.size for f in uploaded_files)
-    st.write(f"📤 Uploaded {len(uploaded_files)} file(s) • Total size: {format_size(total_size)}")
+    if uploaded_files:
+        # Show uploaded files with sizes
+        total_size = sum(f.size for f in uploaded_files)
+        st.write(f"📤 Uploaded {len(uploaded_files)} file(s) • Total size: {format_size(total_size)}")
     
     with st.expander("📋 File Details", expanded=False):
         for f in uploaded_files:
@@ -192,7 +260,7 @@ if uploaded_files:
     if len(uploaded_files) == 1:
         st.subheader("Preview")
         preview_file(uploaded_files[0], from_ext)
-    else:
+    elif len(uploaded_files) > 1:
         st.subheader("Preview")
         tabs = st.tabs([f.name for f in uploaded_files])
         for tab, uploaded_file in zip(tabs, uploaded_files):
